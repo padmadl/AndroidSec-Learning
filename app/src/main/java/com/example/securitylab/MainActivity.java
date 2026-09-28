@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 // Key used to store privacy consent state
-//Modifying this line for user preferences acceptance
+//Modifying this line for user preferences
     private static final String PREF_PRIVACY_CONSENT = "user_privacy_consent";
 
 
