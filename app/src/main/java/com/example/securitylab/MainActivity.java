@@ -1,11 +1,12 @@
 package com.example.securitylab;
 
 import android.os.Bundle;
+import android.os.Environment;
 import androidx.appcompat.app.AppCompatActivity;
 
-// Import SQLCipher classes, NOT standard android.database.sqlite classes
-import net.sqlcipher.database.SQLiteDatabase;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -14,25 +15,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // 1. Initialize SQLCipher native libraries
-        SQLiteDatabase.loadLibs(this);
+        saveSensitiveDataPublicly();
+    }
 
-        // 2. Define the database file path
-        File databaseFile = getDatabasePath("securePrivate.db");
-        databaseFile.getParentFile().mkdirs();
+    private void saveSensitiveDataPublicly() {
+        String sensitiveData = "UserSecretCredentials123!";
 
-        // 3. Open or create the encrypted database with a password
-        SQLiteDatabase secureDB = SQLiteDatabase.openOrCreateDatabase(
-                databaseFile,
-                "password123", // Encryption key / passphrase
-                null
-        );
+        // Get path to the public Downloads directory
+        File publicDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        File file = new File(publicDir, "shared_passwords.txt");
 
-        // 4. Perform database operations (Data is automatically encrypted on disk)
-        secureDB.execSQL("CREATE TABLE IF NOT EXISTS Accounts(Username VARCHAR, Password VARCHAR);");
-        secureDB.execSQL("INSERT INTO Accounts VALUES('admin','AdminPassEnc');");
-
-        // 5. Close database connection
-        secureDB.close();
+        try (FileOutputStream fos = new FileOutputStream(file, true)) {
+            fos.write(sensitiveData.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
